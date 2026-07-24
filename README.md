@@ -334,29 +334,21 @@ Sources
 
 # 📸 Screenshots
 
-Add screenshots here after running the project.
+## 🏗️ Workflow Architecture
 
-Suggested images:
+![Workflow](images/workflow.png)
 
-```
-images/
+---
 
-├── architecture.png
-├── analyst_generation.png
-├── interview_graph.png
-├── final_report.png
-└── langsmith_trace.png
-```
+## 📊 LangSmith Execution Trace
 
-Example:
+![LangSmith](images/langsmith_trace.png)
 
-```markdown
-![Architecture](images/architecture.png)
+---
 
-![Graph Execution](images/interview_graph.png)
+## 📄 Final Generated Report
 
-![Generated Report](images/final_report.png)
-```
+![Final Report](images/final_report.png)
 
 ---
 
