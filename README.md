@@ -438,7 +438,7 @@ This project is licensed under the MIT License.
 **Suman Raj**
 
 - GitHub: https://github.com/SKR18156592
-- LinkedIn: *(Add your LinkedIn profile here)*
+- LinkedIn: https://www.linkedin.com/in/sumanraj11/
 
 ---
 
