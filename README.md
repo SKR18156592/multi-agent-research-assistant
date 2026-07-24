@@ -29,6 +29,13 @@ The workflow includes:
 The project demonstrates modern **agent orchestration** using **LangGraph** rather than a simple prompt chain.
 
 ---
+# 🚀 Why This Project?
+
+Most AI assistants rely on a single LLM response, which can limit the depth, reliability, and diversity of research. Complex research tasks often require exploring multiple perspectives, validating information from external sources, and organizing findings into a coherent report.
+
+This project demonstrates how **LangGraph** can orchestrate a production-inspired **multi-agent workflow**, where multiple AI analysts independently investigate a topic, collaborate through parallel interview workflows, incorporate human feedback, and synthesize their findings into a structured research report with source attribution.
+
+By leveraging graph-based orchestration instead of a linear prompt chain, the system provides a scalable, modular, and extensible architecture for building advanced AI research assistants.
 
 # 🏗️ Architecture
 
