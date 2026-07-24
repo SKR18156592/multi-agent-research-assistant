@@ -32,8 +32,6 @@ The project demonstrates modern **agent orchestration** using **LangGraph** rath
 
 # 🏗️ Architecture
 
-## 🏗️ Architecture
-
 ```mermaid
 flowchart TD
 
