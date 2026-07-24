@@ -32,40 +32,45 @@ The project demonstrates modern **agent orchestration** using **LangGraph** rath
 
 # 🏗️ Architecture
 
-```text
-                    User Topic
-                         │
-                         ▼
-              Create AI Analysts
-                         │
-                         ▼
-           Human Feedback / Approval
-                         │
-                         ▼
-          Parallel Interview Workflows
-      ┌─────────┬─────────┬─────────┬─────────┐
-      │         │         │         │
-      ▼         ▼         ▼         ▼
- Analyst 1  Analyst 2  Analyst 3  Analyst N
-      │         │         │         │
-      └─────────┴─────────┴─────────┘
-                    │
-                    ▼
-          Collect Research Reports
-                    │
-                    ▼
-          Generate Introduction
-                    │
-                    ▼
-            Merge All Sections
-                    │
-                    ▼
-          Generate Conclusion
-                    │
-                    ▼
-             Final Research Report
-```
+## 🏗️ Architecture
 
+```mermaid
+flowchart TD
+
+    A([Start]) --> B[Create AI Analysts]
+    B --> C[Human Feedback / Approval]
+
+    C -->|Approved| D
+
+    subgraph D[Parallel Interview Workflows]
+        direction TB
+
+        D0([Start])
+
+        D0 --> E[Ask Question]
+
+        E --> F[Search Web]
+        E --> G[Search Wikipedia]
+
+        F --> H[Answer Question]
+        G --> H
+
+        H -->|Need More Information| E
+
+        H --> I[Save Interview]
+        I --> J[Write Analyst Section]
+    end
+
+    J --> K[Generate Introduction]
+    J --> L[Generate Conclusion]
+    J --> M[Merge Research Sections]
+
+    K --> N[Finalize Research Report]
+    L --> N
+    M --> N
+
+    N --> O([End])
+```
 ---
 
 # ✨ Features
