@@ -262,52 +262,14 @@ graph.invoke(
 ---
 
 # 🔄 Workflow
-
-## Step 1
-
-Generate Analyst Personas
-
-↓
-
-## Step 2
-
-Human reviews analysts
-
-↓
-
-## Step 3
-
-Launch interview workflows in parallel
-
-↓
-
-## Step 4
-
-Each analyst researches independently
-
-↓
-
-## Step 5
-
-Interview reports are merged
-
-↓
-
-## Step 6
-
-Generate introduction
-
-↓
-
-## Step 7
-
-Generate conclusion
-
-↓
-
-## Step 8
-
-Produce final report
+1. Generate AI analysts
+2. Review analyst personas
+3. Execute interviews in parallel
+4. Collect research findings
+5. Generate analyst reports
+6. Write introduction
+7. Write conclusion
+8. Produce final report
 
 ---
 
