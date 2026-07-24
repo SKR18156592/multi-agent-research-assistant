@@ -364,14 +364,17 @@ Sources
 
 # 🛠️ Technologies Used
 
-- Python
-- LangGraph
-- LangChain
-- OpenAI GPT Models
-- TypedDict
-- Pydantic
-- Tavily Search
-- Jupyter Notebook
+| Technology | Purpose                   |
+| ---------- | ------------------------- |
+| Python     | Core language             |
+| LangGraph  | Multi-agent orchestration |
+| LangChain  | LLM framework             |
+| OpenAI GPT | Reasoning                 |
+| Tavily     | Web search                |
+| Pydantic   | State validation          |
+| LangSmith  | Debugging & tracing       |
+| Jupyter    | Development               |
+
 
 ---
 
