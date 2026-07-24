@@ -89,7 +89,17 @@ flowchart TD
     N --> O([End])
 ```
 ---
+## 🔄 Workflow Overview
 
+The system is composed of two LangGraph workflows:
+
+- 🧠 **Research Graph** – Generates analysts, manages approvals, and coordinates report synthesis.
+
+- 💬 **Interview Graph** – Handles analyst interviews, retrieves external information, and writes individual research sections.
+
+Each analyst operates independently, enabling parallel execution and improved research diversity.
+
+---
 # ✨ Features
 
 ### 🤖 Multi-Agent Collaboration
