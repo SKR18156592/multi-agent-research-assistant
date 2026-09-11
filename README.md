@@ -1,161 +1,257 @@
-# Multi-Agent Research Assistant with LangGraph
+# 🤖 Multi-Agent Research Assistant with LangGraph
 
-A modular multi-agent research pipeline built with **LangGraph**, **LangChain**, and **OpenAI GPT-4o**. The system dynamically generates diverse expert analyst personas, pauses for human editorial review (HITL), conducts parallel web and Wikipedia searches via LangGraph’s `Send()` API, and aggregates the findings into an authoritative, synthesized research report.
-
----
-
-## Key Features
-
-* **Dynamic Persona Generation**: Creates targeted analyst personas based on central themes extracted from any given topic.
-
-
-* **Human-in-the-Loop (HITL)**: Uses LangGraph checkpointer memory (`MemorySaver`) to pause execution before interviews begin, allowing you to edit, steer, or approve the analyst team.
-
-
-* **Parallel Interview Subgraphs**: Dispatches concurrent interview processes for each persona using LangGraph's `Send()` API.
-
-
-* **Grounded Multi-Source Retrieval**: Queries live web data using Tavily Search (`langchain-tavily`) alongside academic context via Wikipedia (`WikipediaLoader`).
-
-
-* **Map-Reduce Synthesis**: Summarizes individual analyst memos, handles source deduplication, and generates an integrated introduction and conclusion.
-
-
+> An end-to-end, multi-agent research engine that orchestrates dynamic persona generation, **Human-in-the-Loop (HITL)** editorial steering, concurrent web/academic grounding, and map-reduce report synthesis using **LangGraph**.
 
 ---
 
-## Architecture Flow
+## 📑 Table of Contents
 
-```text
-[START]
-   │
-   ▼
-[create_analysts]
-   │
-   ▼
-[human_feedback]  <--- (Interrupt: Approve or provide feedback)
-   │
-   ├─► (Feedback given) ──► [create_analysts]
-   │
-   └─► (Approved) ────────► [Send() Map Step]
-                                 │
-                 ┌───────────────┼───────────────┐
-                 ▼               ▼               ▼
-           [Interview 1]   [Interview 2]   [Interview 3]
-           (Tavily/Wiki)   (Tavily/Wiki)   (Tavily/Wiki)
-                 │               │               │
-                 └───────────────┼───────────────┘
-                                 ▼
-                         [Reduce Steps]
-                    ┌────────────┼────────────┐
-                    ▼            ▼            ▼
-             [write_intro] [write_report] [write_conclusion]
-                    │            │            │
-                    └────────────┼────────────┘
-                                 ▼
-                         [finalize_report]
-                                 │
-                                 ▼
-                              [END]
+* [Overview](https://www.google.com/search?q=%23-overview)
+* [Key Highlights](https://www.google.com/search?q=%23-key-highlights)
+* [System Architecture](https://www.google.com/search?q=%23-system-architecture)
+* [Project Layout](https://www.google.com/search?q=%23-project-layout)
+* [Prerequisites & Tools](https://www.google.com/search?q=%23-prerequisites--tools)
+* [Quickstart Guide](https://www.google.com/search?q=%23-quickstart-guide)
+* [Interactive Workflow](https://www.google.com/search?q=%23-interactive-workflow)
+* [Configuration & Customization](https://www.google.com/search?q=%23-configuration--customization)
+* [Output Format](https://www.google.com/search?q=%23-output-format)
+
+---
+
+## 🌟 Overview
+
+The **Multi-Agent Research Assistant** automates the deep-dive research lifecycle. Instead of relying on a single prompt-response loop, the system simulates a full research team:
+
+1. **The Lead Editor** breaks down a topic and provisions specialist analyst personas.
+2. **The User (HITL)** reviews, refines, approves, or redirects the analyst squad before execution continues.
+3. **The Specialists** execute independent parallel subgraphs, grilling simulated domain experts grounded via **Tavily Web Search** and **Wikipedia**.
+4. **The Synthesis Engine** executes map-reduce aggregation, reconciling contradictions, consolidating deduplicated citations, and rendering an executive report.
+
+---
+
+## ✨ Key Highlights
+
+| Feature | Implementation | Description |
+| --- | --- | --- |
+| **Dynamic Personas** | `Pydantic` + Structured Outputs | Generates high-context analyst identities (name, role, affiliation, bias/focus) tailored to themes. |
+| **Human-in-the-Loop** | LangGraph `interrupt_before` | Suspends execution to state memory (`MemorySaver`), accepting feedback to rewrite personas on the fly. |
+| **Scatter-Gather (Map-Reduce)** | LangGraph `Send()` API | Dispatches isolated interview graphs concurrently for all personas, cutting total latency. |
+| **Multi-Source Grounding** | `TavilySearch` + `WikipediaLoader` | Queries both live real-time web results and deep encyclopedic context per interview turn. |
+| **Deduplicated Citations** | Automated Markdown Synthesizer | Combines interview memos, extracts inline references (`[1]`, `[2]`), and merges sources into a master ledger. |
+
+---
+
+## 📐 System Architecture
+
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#2563eb', 'edgeLabelBackground':'#ffffff', 'tertiaryColor': '#f1f5f9'}}}%%
+flowchart TD
+    START([Start Pipeline]) --> CA[create_analysts\nGenerates Analyst Personas via LLM]
+    CA --> HF{human_feedback\nHITL Interrupt Node}
+    
+    HF -- "Feedback Provided" --> CA
+    HF -- "Approved (Empty Input)" --> DISPATCH[Send API / Map Step\nParallel Execution Dispatcher]
+    
+    subgraph Parallel_Interviews [Parallel Interview Subgraphs]
+        direction TB
+        subgraph Subgraph_1 [Analyst Persona 1]
+            Q1[Ask Question] --> W1[Tavily & Wiki Search] --> A1[Expert Answer] --> S1[Section Memo]
+        end
+        subgraph Subgraph_2 [Analyst Persona 2]
+            Q2[Ask Question] --> W2[Tavily & Wiki Search] --> A2[Expert Answer] --> S2[Section Memo]
+        end
+        subgraph Subgraph_3 [Analyst Persona 3]
+            Q3[Ask Question] --> W3[Tavily & Wiki Search] --> A3[Expert Answer] --> S3[Section Memo]
+        end
+    end
+
+    DISPATCH --> Subgraph_1
+    DISPATCH --> Subgraph_2
+    DISPATCH --> Subgraph_3
+    
+    Subgraph_1 --> REDUCE[Reduce / Map Aggregate]
+    Subgraph_2 --> REDUCE
+    Subgraph_3 --> REDUCE
+    
+    subgraph Final_Synthesis [Parallel Report Sectioning]
+        direction LR
+        WI[write_introduction]
+        WR[write_report / insights]
+        WC[write_conclusion]
+    end
+    
+    REDUCE --> WI
+    REDUCE --> WR
+    REDUCE --> WC
+    
+    WI --> FR[finalize_report\nReconcile Content + Deduplicate Sources]
+    WR --> FR
+    WC --> FR
+    
+    FR --> OUTPUT([Write to final_report.md])
+    OUTPUT --> END_NODE([End Pipeline])
 
 ```
 
 ---
 
-## Project Structure
+## 📂 Project Layout
 
 ```text
 multi-agent-research-assistant/
-├── .env.example
-├── .gitignore
-├── README.md
-├── requirements.txt
-├── main.py
+├── .env.example              # Template for API credentials
+├── .gitignore                # Production ignore patterns (cache, env, checkpoints)
+├── README.md                 # System overview and instructions
+├── requirements.txt          # Pinned runtime dependencies
+├── main.py                   # Terminal interface & execution runner
 └── src/
-    ├── __init__.py
-    ├── config.py
-    ├── models.py
-    ├── prompts.py
-    ├── tools.py
-    ├── graph.py
+    ├── __init__.py           # Package marker
+    ├── config.py             # Model initializations & environment setup
+    ├── models.py             # Pydantic models & LangGraph TypedDict states
+    ├── prompts.py            # System prompts for personas, search, & drafting
+    ├── tools.py              # Search integrations (Tavily & Wikipedia)
+    ├── graph.py              # Core multi-agent StateGraph orchestrator
     └── subgraphs/
-        ├── __init__.py
-        └── interview.py
+        ├── __init__.py       # Subgraph package marker
+        └── interview.py      # Independent Q&A interview engine
 
 ```
 
 ---
 
-## Prerequisites
+## 🛠 Prerequisites & Tools
 
-* Python 3.10+
-* OpenAI API Key
-* Tavily API Key
+* **Python**: Version `3.10` or higher
+* **OpenAI API Key**: Used with `gpt-4o-mini` (or standard `gpt-4o`)
+* **Tavily API Key**: Real-time web grounding engineered for agentic applications
 
 ---
 
-## Setup & Installation
+## 🚀 Quickstart Guide
 
-1. **Clone the repository:**
+### 1. Clone & Set Up Environment
+
 ```bash
+# Clone the repository
 git clone https://github.com/SKR18156592/multi-agent-research-assistant.git
 cd multi-agent-research-assistant
 
-```
-
-
-2. **Create and activate a virtual environment:**
-```bash
+# Create virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Activate virtual environment
+# macOS/Linux:
+source venv/bin/activate
+# Windows:
+# venv\Scripts\activate
 
 ```
 
+### 2. Install Dependencies
 
-3. **Install dependencies:**
 ```bash
+pip install --upgrade pip
 pip install -r requirements.txt
 
 ```
 
+### 3. Configure API Credentials
 
-4. **Configure environment variables:**
+Copy `.env.example` to `.env` and fill in your keys:
+
 ```bash
 cp .env.example .env
 
 ```
 
+Edit `.env`:
 
-Add your API keys inside `.env`:
-```bash
-OPENAI_API_KEY="your-openai-api-key"
-TAVILY_API_KEY="your-tavily-api-key"
+```env
+OPENAI_API_KEY="sk-proj-..."
+TAVILY_API_KEY="tvly-..."
+OPENAI_MODEL="gpt-4o-mini"
 
 ```
 
-
-
----
-
-## Usage
-
-Run the main pipeline:
+### 4. Run the Engine
 
 ```bash
 python main.py
 
 ```
 
-1. **Input Topic**: Enter your research topic (e.g., `The benefits of adopting LangGraph as an agent framework`).
+---
+
+## 💬 Interactive Workflow
+
+```text
+Enter research topic: The impact of Small Language Models (SLMs) in on-device AI
+
+[+] Initializing analyst generation for: 'The impact of Small Language Models (SLMs) in on-device AI'...
+
+Generated 3 Analyst Personas:
+- Dr. Kevin Vance (Edge Compute Engineer | Embedded Systems Corp.)
+  Focus: Hardware acceleration, memory limits, and NPU performance benchmarks.
+
+- Priya Sharma (Product Lead | NextGen Mobile AI)
+  Focus: Battery life consumption, latency in real-time UX, and app adoption.
+
+- Marcus Brody (Cybersecurity & Compliance Director | EdgeSec)
+  Focus: Local data privacy, on-device encryption, and vulnerability to extraction attacks.
+
+Provide feedback on personas (Press Enter to approve & continue): 
+
+```
+
+### Human-in-the-Loop Options:
+
+* **To Approve**: Press **Enter** on an empty line. The system immediately kicks off the concurrent interview pipelines.
+* **To Steer / Modify**: Type specific instructions.
+```text
+> Replace the product lead with an open-source model optimization researcher specializing in quantization (GGUF/AWQ).
+
+```
 
 
-2. **Review Personas (HITL)**:
-* **Approve**: Press `Enter` to proceed with the generated personas.
+The LLM updates the personas to match your feedback and displays them again for confirmation.
 
+---
 
-* **Steer**: Enter custom feedback (e.g., *"Add a startup founder perspective"* or *"Focus on enterprise security"*) to regenerate them.
+## ⚙️ Configuration & Customization
 
+* **Adjust Persona Count**: Edit `max_analysts = 3` inside `main.py` to scale your specialist team up or down.
+* **Interview Turns**: In `src/subgraphs/interview.py`, set `max_num_turns` (default: `2`) to expand the depth of questions per analyst.
+* **Search Density**: Adjust `max_results` in `src/tools.py` for `TavilySearch` (default: `3`) or `load_max_docs` for `WikipediaLoader` (default: `2`).
+* **Model Selection**: Switch between `gpt-4o-mini` and `gpt-4o` in `.env` or `src/config.py`.
 
+---
 
+## 📄 Output Format
 
-3. **Report Generation**: The pipeline runs parallel interviews and outputs a Markdown report saved to `final_report.md`.
+Upon pipeline completion, the synthesized document is written to `final_report.md`:
+
+```markdown
+# [Dynamic Engaging Title Generated from Topic]
+
+## Introduction
+[Crisp ~100-word overview previewing key takeaways from all domains]
+
+---
+
+## Insights
+[Deep-dive synthesis synthesizing evidence from each analyst interview memo]
+- Cross-examination of technical performance [1]
+- Economic and operational trade-offs [2]
+- Regulatory compliance and risk analysis [3]
+
+---
+
+## Conclusion
+[Executive synthesis framing future outlook and strategic roadmap]
+
+## Sources
+[1] https://tavily.com/...
+[2] https://en.wikipedia.org/...
+[3] https://docs.langchain.com/...
+
+```
