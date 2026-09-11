@@ -1,6 +1,6 @@
 # Multi-Agent Research Assistant with LangGraph
 
-A modular multi-agent research pipeline built with **LangGraph**, **LangChain**, and **OpenAI GPT-4o-mini**. The system dynamically generates diverse expert analyst personas, pauses for human editorial review (HITL), conducts parallel web and Wikipedia searches via LangGraph’s `Send()` API, and aggregates the findings into an authoritative, synthesized research report.
+A modular multi-agent research pipeline built with **LangGraph**, **LangChain**, and **OpenAI GPT-4o**. The system dynamically generates diverse expert analyst personas, pauses for human editorial review (HITL), conducts parallel web and Wikipedia searches via LangGraph’s `Send()` API, and aggregates the findings into an authoritative, synthesized research report.
 
 ---
 
