@@ -1,12 +1,12 @@
 from langgraph.graph import StateGraph, START, END
 from langgraph.constants import Send
-from graphs.state import ResearchState, InterviewState
+from extra.graphs.state import ResearchState, InterviewState
 from agents.analyst import create_analysts
 from graphs.interview_graph import build_interview_graph
 from prompts.report_prompts import FINAL_REPORT_COMPILER_PROMPT
 from langchain_openai import ChatOpenAI
 
-llm = ChatOpenAI(model="gpt-4o", temperature=0)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 interview_subgraph = build_interview_graph()
 
 def generate_analysts_node(state: ResearchState):
@@ -48,3 +48,30 @@ def build_research_graph():
     builder.add_edge("compile_report", END)
 
     return builder.compile()
+
+def build_research_graph():
+    # Add nodes and edges 
+    builder=StateGraph(ResearchGraphState)
+    builder.add_node(create_analysts)
+    builder.add_node(human_feedback)
+    builder.add_node('conduct_interview',interview_builder.compile())
+    builder.add_node(write_conclusion)
+    builder.add_node(write_introduction)
+    builder.add_node(write_report)
+    builder.add_node(finalize_report)
+
+    # Logic
+    builder.add_edge(START,'create_analysts')
+    builder.add_edge('create_analysts','human_feedback')
+    builder.add_conditional_edges('human_feedback',intialize_all_interview,['create_analysts','conduct_interview'])
+    builder.add_edge('conduct_interview','write_conclusion')
+    builder.add_edge('conduct_interview','write_introduction')
+    builder.add_edge('conduct_interview','write_report')
+    builder.add_edge('write_conclusion','finalize_report')
+    builder.add_edge('write_introduction','finalize_report')
+    builder.add_edge('write_report','finalize_report')
+
+    # Compile
+    memory=MemorySaver()
+    graph=builder.compile(interrupt_before=['human_feedback'],checkpointer=memory)
+    display(Image(graph.get_graph(xray=1).draw_mermaid_png()))

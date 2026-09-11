@@ -1,2 +1,7 @@
-# Environment variables
+__pycache__/
+*.py[cod]
+*$py.class
 .env
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
