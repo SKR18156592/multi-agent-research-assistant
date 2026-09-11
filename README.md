@@ -1,24 +1,24 @@
 # Multi-Agent Research Assistant with LangGraph
 
-A modular multi-agent research pipeline built with **LangGraph**, **LangChain**, and **OpenAI GPT-4o-mini**. The system dynamically generates diverse expert analyst personas, pauses for human editorial review, conducts parallel web and Wikipedia searches via LangGraph’s `Send()` API, and aggregates the findings into a synthesized research report.
+A modular multi-agent research pipeline built with **LangGraph**, **LangChain**, and **OpenAI GPT-4o-mini**. The system dynamically generates diverse expert analyst personas, pauses for human editorial review (HITL), conducts parallel web and Wikipedia searches via LangGraph’s `Send()` API, and aggregates the findings into an authoritative, synthesized research report.
 
 ---
 
 ## Key Features
 
-* **Persona Generation**: Creates tailored analyst personas mapped to top themes of any given research topic.
+* **Dynamic Persona Generation**: Creates targeted analyst personas based on central themes extracted from any given topic.
 
 
-* **Human-in-the-Loop (HITL)**: Uses LangGraph checkpointer memory (`MemorySaver`) to pause execution, allowing review, persona editing, or insertion of custom perspectives.
+* **Human-in-the-Loop (HITL)**: Uses LangGraph checkpointer memory (`MemorySaver`) to pause execution before interviews begin, allowing you to edit, steer, or approve the analyst team.
 
 
-* **Parallel Interview Subgraphs**: Dispatches concurrent interview processes for each analyst persona using LangGraph's `Send()` API.
+* **Parallel Interview Subgraphs**: Dispatches concurrent interview processes for each persona using LangGraph's `Send()` API.
 
 
-* **Multi-Source Tool Grounding**: Retrieves evidence using Tavily Search (`langchain-tavily`) and Wikipedia (`WikipediaLoader`).
+* **Grounded Multi-Source Retrieval**: Queries live web data using Tavily Search (`langchain-tavily`) alongside academic context via Wikipedia (`WikipediaLoader`).
 
 
-* **Map-Reduce Synthesis**: Summarizes individual analyst findings, handles source deduplication, and generates an integrated introduction and conclusion.
+* **Map-Reduce Synthesis**: Summarizes individual analyst memos, handles source deduplication, and generates an integrated introduction and conclusion.
 
 
 
@@ -26,7 +26,7 @@ A modular multi-agent research pipeline built with **LangGraph**, **LangChain**,
 
 ## Architecture Flow
 
-```
+```text
 [START]
    │
    ▼
@@ -98,7 +98,7 @@ multi-agent-research-assistant/
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/<your-username>/multi-agent-research-assistant.git
+git clone https://github.com/SKR18156592/multi-agent-research-assistant.git
 cd multi-agent-research-assistant
 
 ```
@@ -119,14 +119,14 @@ pip install -r requirements.txt
 ```
 
 
-4. **Set up environment variables:**
+4. **Configure environment variables:**
 ```bash
 cp .env.example .env
 
 ```
 
 
-Add your credentials inside `.env`:
+Add your API keys inside `.env`:
 ```bash
 OPENAI_API_KEY="your-openai-api-key"
 TAVILY_API_KEY="your-tavily-api-key"
@@ -139,23 +139,23 @@ TAVILY_API_KEY="your-tavily-api-key"
 
 ## Usage
 
-Run the entry point script:
+Run the main pipeline:
 
 ```bash
 python main.py
 
 ```
 
-1. **Enter Topic**: Input your research query (e.g., `The benefits of adopting LangGraph as an agent framework`).
+1. **Input Topic**: Enter your research topic (e.g., `The benefits of adopting LangGraph as an agent framework`).
 
 
 2. **Review Personas (HITL)**:
-* **Approve**: Press `Enter` without typing to proceed.
+* **Approve**: Press `Enter` to proceed with the generated personas.
 
 
-* **Modify**: Type feedback into the prompt (e.g., *"Add a startup founder perspective"* or *"Focus on enterprise security"*) to regenerate personas.
+* **Steer**: Enter custom feedback (e.g., *"Add a startup founder perspective"* or *"Focus on enterprise security"*) to regenerate them.
 
 
 
 
-3. **Report Output**: Once the parallel interviews finish, the compiled report is written to `final_report.md`.
+3. **Report Generation**: The pipeline runs parallel interviews and outputs a Markdown report saved to `final_report.md`.
