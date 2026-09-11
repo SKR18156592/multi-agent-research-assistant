@@ -1,439 +1,161 @@
-# 🔍 Multi-Agent Research Assistant
+# Multi-Agent Research Assistant with LangGraph
 
-> A production-inspired AI research assistant built with **LangGraph**, **LangChain**, and **Large Language Models** that performs collaborative research through multiple AI analysts, human feedback, parallel interviews, and automated report generation.
-
-![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
-![LangGraph](https://img.shields.io/badge/LangGraph-Agent%20Workflow-green)
-![LangChain](https://img.shields.io/badge/LangChain-LLM%20Framework-success)
-![License](https://img.shields.io/badge/License-MIT-yellow)
-![Status](https://img.shields.io/badge/Status-Active-brightgreen)
+A modular multi-agent research pipeline built with **LangGraph**, **LangChain**, and **OpenAI GPT-4o-mini**. The system dynamically generates diverse expert analyst personas, pauses for human editorial review, conducts parallel web and Wikipedia searches via LangGraph’s `Send()` API, and aggregates the findings into a synthesized research report.
 
 ---
 
-# 📖 Overview
+## Key Features
 
-Traditional AI assistants rely on a single LLM response, which often limits research quality and diversity of perspectives.
+* **Persona Generation**: Creates tailored analyst personas mapped to top themes of any given research topic.
 
-This project introduces a **multi-agent research workflow** where multiple AI analysts collaboratively investigate a topic, conduct independent interviews, synthesize findings, and generate a structured research report.
 
-The workflow includes:
+* **Human-in-the-Loop (HITL)**: Uses LangGraph checkpointer memory (`MemorySaver`) to pause execution, allowing review, persona editing, or insertion of custom perspectives.
 
-- 👥 AI analyst generation
-- ✋ Human-in-the-loop approval
-- ⚡ Parallel analyst interviews
-- 🌐 Web-based information gathering
-- 🧠 Multi-agent reasoning
-- 📝 Automated report synthesis
-- 📚 Source attribution
 
-The project demonstrates modern **agent orchestration** using **LangGraph** rather than a simple prompt chain.
+* **Parallel Interview Subgraphs**: Dispatches concurrent interview processes for each analyst persona using LangGraph's `Send()` API.
 
----
-# ✨ Highlights
 
-- 🤖 Multi-Agent AI Research Workflow
-- ⚡ Parallel Execution with LangGraph
-- 👨‍💻 Human-in-the-Loop Approval
-- 🌐 Web & Wikipedia Research
-- 📑 Automated Report Generation
-- 📚 Source Attribution
-- 🧠 Typed State Management
-  
----
-# 🚀 Why This Project?
+* **Multi-Source Tool Grounding**: Retrieves evidence using Tavily Search (`langchain-tavily`) and Wikipedia (`WikipediaLoader`).
 
-Most AI assistants rely on a single LLM response, which can limit the depth, reliability, and diversity of research. Complex research tasks often require exploring multiple perspectives, validating information from external sources, and organizing findings into a coherent report.
 
-This project demonstrates how **LangGraph** can orchestrate a production-inspired **multi-agent workflow**, where multiple AI analysts independently investigate a topic, collaborate through parallel interview workflows, incorporate human feedback, and synthesize their findings into a structured research report with source attribution.
+* **Map-Reduce Synthesis**: Summarizes individual analyst findings, handles source deduplication, and generates an integrated introduction and conclusion.
 
-By leveraging graph-based orchestration instead of a linear prompt chain, the system provides a scalable, modular, and extensible architecture for building advanced AI research assistants.
+
 
 ---
-# 🏗️ Architecture
 
-```mermaid
-flowchart TD
+## Architecture Flow
 
-    A([Start]) --> B[Create AI Analysts]
-    B --> C[Human Feedback / Approval]
-
-    C -->|Approved| D
-
-    subgraph D[Parallel Interview Workflows]
-        direction TB
-
-        D0([Start])
-
-        D0 --> E[Ask Question]
-
-        E --> F[Search Web]
-        E --> G[Search Wikipedia]
-
-        F --> H[Answer Question]
-        G --> H
-
-        H -->|Need More Information| E
-
-        H --> I[Save Interview]
-        I --> J[Write Analyst Section]
-    end
-
-    J --> K[Generate Introduction]
-    J --> L[Generate Conclusion]
-    J --> M[Merge Research Sections]
-
-    K --> N[Finalize Research Report]
-    L --> N
-    M --> N
-
-    N --> O([End])
 ```
----
-## 🔄 Workflow Overview
+[START]
+   │
+   ▼
+[create_analysts]
+   │
+   ▼
+[human_feedback]  <--- (Interrupt: Approve or provide feedback)
+   │
+   ├─► (Feedback given) ──► [create_analysts]
+   │
+   └─► (Approved) ────────► [Send() Map Step]
+                                 │
+                 ┌───────────────┼───────────────┐
+                 ▼               ▼               ▼
+           [Interview 1]   [Interview 2]   [Interview 3]
+           (Tavily/Wiki)   (Tavily/Wiki)   (Tavily/Wiki)
+                 │               │               │
+                 └───────────────┼───────────────┘
+                                 ▼
+                         [Reduce Steps]
+                    ┌────────────┼────────────┐
+                    ▼            ▼            ▼
+             [write_intro] [write_report] [write_conclusion]
+                    │            │            │
+                    └────────────┼────────────┘
+                                 ▼
+                         [finalize_report]
+                                 │
+                                 ▼
+                              [END]
 
-The system is composed of two LangGraph workflows:
-
-- 🧠 **Research Graph** – Generates analysts, manages approvals, and coordinates report synthesis.
-
-- 💬 **Interview Graph** – Handles analyst interviews, retrieves external information, and writes individual research sections.
-
-Each analyst operates independently, enabling parallel execution and improved research diversity.
-
----
-# ✨ Features
-
-### 🤖 Multi-Agent Collaboration
-
-- Multiple AI analysts work independently
-- Diverse analyst personas
-- Parallel research execution
-
-### 🔄 LangGraph Orchestration
-
-- Graph-based workflow
-- Typed state management
-- Conditional routing
-- Parallel execution using `Send()`
-
-### 👨‍💻 Human-in-the-Loop
-
-- Review generated analysts
-- Modify analyst personas
-- Approve before execution
-
-### 📑 Automated Report Generation
-
-The assistant automatically generates:
-
-- Executive Introduction
-- Individual analyst findings
-- Combined insights
-- Conclusion
-- References & Sources
-
-### 🌐 External Knowledge
-
-Supports:
-
-- Web Search
-- Search APIs
-- Document Retrieval
-- LLM reasoning
-
-### ⚡ Parallel Processing
-
-Multiple interview agents execute simultaneously, reducing total execution time while improving research quality.
+```
 
 ---
 
-# 📂 Project Structure
+## Project Structure
 
 ```text
 multi-agent-research-assistant/
-│
-├── graphs/
-│   ├── research_graph.py
-│   ├── interview_graph.py
-│   └── state.py
-│
-├── agents/
-│   ├── analyst.py
-│   ├── interviewer.py
-│   └── researcher.py
-│
-├── prompts/
-│   ├── analyst_prompts.py
-│   ├── interview_prompts.py
-│   └── report_prompts.py
-│
-├── utils/
-│   ├── helpers.py
-│   ├── formatting.py
-│   └── search.py
-│
-├── notebooks/
-│
-├── outputs/
-│
-├── images/
-│
-├── requirements.txt
 ├── .env.example
+├── .gitignore
 ├── README.md
-└── LICENSE
+├── requirements.txt
+├── main.py
+└── src/
+    ├── __init__.py
+    ├── config.py
+    ├── models.py
+    ├── prompts.py
+    ├── tools.py
+    ├── graph.py
+    └── subgraphs/
+        ├── __init__.py
+        └── interview.py
+
 ```
 
 ---
 
-# ⚙️ Installation
+## Prerequisites
 
-## 1. Clone the repository
+* Python 3.10+
+* OpenAI API Key
+* Tavily API Key
 
+---
+
+## Setup & Installation
+
+1. **Clone the repository:**
 ```bash
-git clone https://github.com/SKR18156592/multi-agent-research-assistant.git
-
+git clone https://github.com/<your-username>/multi-agent-research-assistant.git
 cd multi-agent-research-assistant
+
 ```
 
----
 
-## 2. Create Virtual Environment
-
+2. **Create and activate a virtual environment:**
 ```bash
-python -m venv .venv
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
 ```
 
-Activate:
 
-### Windows
-
-```bash
-.venv\Scripts\activate
-```
-
-### Linux / macOS
-
-```bash
-source .venv/bin/activate
-```
-
----
-
-## 3. Install Dependencies
-
+3. **Install dependencies:**
 ```bash
 pip install -r requirements.txt
+
 ```
 
----
 
-## 4. Configure Environment
-
-Create a `.env` file.
-
+4. **Set up environment variables:**
 ```bash
 cp .env.example .env
-```
-
----
-
-# 🔑 Environment Variables
-
-```env
-OPENAI_API_KEY=your_api_key
-
-TAVILY_API_KEY=your_api_key
-
-LANGCHAIN_API_KEY=your_api_key
-
-LANGCHAIN_PROJECT=Multi-Agent-Research
-
-LANGCHAIN_TRACING_V2=true
-```
-
----
-
-# 🚀 Usage
-
-Run the notebook or Python script.
-
-Example:
-
-```python
-topic = "Future of Quantum Computing"
-
-graph.invoke(
-    {
-        "topic": topic
-    }
-)
-```
-
----
-
-# 🔄 Workflow
-1. Generate AI analysts
-2. Review analyst personas
-3. Execute interviews in parallel
-4. Collect research findings
-5. Generate analyst reports
-6. Write introduction
-7. Write conclusion
-8. Produce final report
-
----
-
-# 📄 Example Output
 
 ```
-Future of Quantum Computing
 
-Introduction
---------------------------
 
-Quantum computing is rapidly transforming...
+Add your credentials inside `.env`:
+```bash
+OPENAI_API_KEY="your-openai-api-key"
+TAVILY_API_KEY="your-tavily-api-key"
 
-------------------------------------------
-
-Insights
-
-Analyst 1
-• Hardware challenges
-
-Analyst 2
-• Error correction
-
-Analyst 3
-• Industry adoption
-
-Analyst 4
-• Commercial outlook
-
-------------------------------------------
-
-Conclusion
-
-Quantum computing continues to evolve...
-
-------------------------------------------
-
-Sources
-
-• https://...
-• https://...
-• https://...
 ```
 
----
-
-# 📸 Screenshots
-
-## 🏗️ Workflow Architecture
-
-![Workflow](images/workflow.png)
-
----
-
-## 📊 LangSmith Execution Trace
-
-![LangSmith](images/langsmith_trace.png)
-
----
-
-## 📄 Final Generated Report
-
-![Final Report](images/final_report.png)
-
----
-
-# 🛠️ Technologies Used
-
-| Technology | Purpose                   |
-| ---------- | ------------------------- |
-| Python     | Core language             |
-| LangGraph  | Multi-agent orchestration |
-| LangChain  | LLM framework             |
-| OpenAI GPT | Reasoning                 |
-| Tavily     | Web search                |
-| Pydantic   | State validation          |
-| LangSmith  | Debugging & tracing       |
-| Jupyter    | Development               |
 
 
 ---
 
-# 💡 Key Concepts Demonstrated
+## Usage
 
-- Multi-Agent Systems
-- Graph-Based AI Workflows
-- Human-in-the-Loop AI
-- State Management
-- Parallel Execution
-- Prompt Engineering
-- LLM Orchestration
-- Report Synthesis
-
----
-
-# 🎯 Future Improvements
-
-- [ ] Streamlit Web Interface
-- [ ] FastAPI REST API
-- [ ] Docker Support
-- [ ] CI/CD with GitHub Actions
-- [ ] Unit Tests
-- [ ] Persistent Checkpoints
-- [ ] Multi-LLM Support
-- [ ] Local Model Support (Ollama)
-- [ ] PDF Report Export
-- [ ] Vector Database Memory
-- [ ] Evaluation Metrics
-- [ ] Live Streaming Responses
-
----
-
-# 🤝 Contributing
-
-Contributions are welcome!
-
-1. Fork the repository
-2. Create a feature branch
+Run the entry point script:
 
 ```bash
-git checkout -b feature/my-feature
+python main.py
+
 ```
 
-3. Commit changes
+1. **Enter Topic**: Input your research query (e.g., `The benefits of adopting LangGraph as an agent framework`).
 
-```bash
-git commit -m "Add awesome feature"
-```
 
-4. Push
+2. **Review Personas (HITL)**:
+* **Approve**: Press `Enter` without typing to proceed.
 
-```bash
-git push origin feature/my-feature
-```
 
-5. Open a Pull Request
+* **Modify**: Type feedback into the prompt (e.g., *"Add a startup founder perspective"* or *"Focus on enterprise security"*) to regenerate personas.
 
----
 
-# 📜 License
 
-This project is licensed under the MIT License.
 
----
-
-# 👨‍💻 Author
-
-**Suman Raj**
-
-- GitHub: https://github.com/SKR18156592
-- LinkedIn: https://www.linkedin.com/in/sumanraj11/
-
----
-
-## ⭐ If you found this project helpful, consider giving it a Star!
-
-It helps others discover the project and supports future improvements.
+3. **Report Output**: Once the parallel interviews finish, the compiled report is written to `final_report.md`.
