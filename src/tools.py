@@ -9,7 +9,8 @@ wikipedia.set_user_agent("research-assistant/0.1 (you@example.com)")
 tavily_search = TavilySearch(max_results=3)
 
 def fetch_web_search(query: str) -> str:
-    search_docs = tavily_search.invoke({"query": query})
+    data = tavily_search.invoke({"query": query})
+    search_docs = data.get("results", [])
     return "\n\n---\n\n".join(
         [
             f'<Document href="{doc["url"]}"/>\n{doc["content"]}\n</Document>'
