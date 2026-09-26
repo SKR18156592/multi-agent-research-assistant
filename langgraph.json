@@ -1,11 +1,10 @@
 {
-  "dockerfile_lines": [],
+  "dependencies": ["."],
   "graphs": {
     "research_assistant": "./src/graph.py:research_assistant_graph"
   },
-  "env": "./.env",
-  "python_version": "3.11",
-  "dependencies": [
-    "."
-  ]
+  "env": ".env",
+  "watch": {
+    "ignore": ["lc-academy-env/**", ".langgraph_api/**", "__pycache__/**"]
+  }
 }

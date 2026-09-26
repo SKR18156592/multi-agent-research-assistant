@@ -121,6 +121,9 @@ builder.add_edge("write_introduction", "finalize_report")
 builder.add_edge("write_report", "finalize_report")
 
 checkpointer = MemorySaver()
+# research_assistant_graph = builder.compile(
+#     interrupt_before=["human_feedback"],
+# )
 research_assistant_graph = builder.compile(
     interrupt_before=["human_feedback"],
     checkpointer=checkpointer
